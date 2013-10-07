@@ -33,22 +33,22 @@ import java.util.Collections;
 public class ConverterProviderBuilderTest {
   @Test
   public void empty() {
-    assertThat(ConverterProviderBuilder.builder().build()
+    assertThat(ConverterProviders.builder().build()
             .getConverter(Integer.class).convert("any", property("key", Integer.class)))
             .isEqualTo(Converter.Result.<Integer>skip());
   }
 
   @Test
   public void freeConverter() {
-    assertThat(ConverterProviderBuilder.builder()
-            .converter(new Converter<String>() {
+    assertThat(ConverterProviders.builder()
+            .add(new Converter<String>() {
               @Override
               public boolean canConvert(Class<?> type) {
                 return true;
               }
 
               @Override
-              public Result<String> convert(String value, Proper.Ty<String> info) {
+              public Result<String> convert(String value, Proper.Info<String> info) {
                 return Result.ok("ok");
               }
             })
@@ -58,17 +58,17 @@ public class ConverterProviderBuilderTest {
   }
 
   @Test
-  public void mappedConverter() {
-    ConverterProvider cp = ConverterProviderBuilder.builder()
-            .converter(Integer.class, Converters.intConverter())
-            .converter(new Converter<Object>() {
+  public void typedConverter() {
+    ConverterProvider cp = ConverterProviders.builder()
+            .add(Converters.intConverter())
+            .add(new Converter<Object>() {
               @Override
               public boolean canConvert(Class<?> type) {
                 return true;
               }
 
               @Override
-              public Result<Object> convert(String value, Proper.Ty<Object> info) {
+              public Result<Object> convert(String value, Proper.Info<Object> info) {
                 return Result.fail("fallback");
               }
             }).build();
@@ -80,16 +80,16 @@ public class ConverterProviderBuilderTest {
 
   @Test
   public void compoundConverter() {
-    ConverterProvider cp = ConverterProviderBuilder.builder()
-            .convertersFrom(Converters.defaultConverterProvider())
-            .converter(new Converter<Object>() {
+    ConverterProvider cp = ConverterProviders.builder()
+            .allFrom(ConverterProviders.defaultConverterProvider())
+            .add(new Converter<Object>() {
               @Override
               public boolean canConvert(Class<?> type) {
                 return true;
               }
 
               @Override
-              public Result<Object> convert(String value, Proper.Ty<Object> info) {
+              public Result<Object> convert(String value, Proper.Info<Object> info) {
                 return Result.fail("fallback");
               }
             }).build();
@@ -99,7 +99,7 @@ public class ConverterProviderBuilderTest {
             .isEqualTo(Converter.Result.fail("fallback"));
   }
 
-  private static <T> Proper.Ty<T> property(String key, Class<T> type) {
-    return new Proper.Ty<>(key, type, null, Collections.<String, Object>emptyMap());
+  private static <T> Proper.Info<T> property(String key, Class<T> type) {
+    return new Proper.Info<>(key, type, null, Collections.<String, Object>emptyMap());
   }
 }

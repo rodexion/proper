@@ -25,11 +25,11 @@ package com.github.rodexion.proper;
  * @since 0.1
  */
 public class ConversionException extends RuntimeException {
-  public ConversionException(String value, Proper.Ty<?> info) {
+  public ConversionException(String value, Proper.Info<?> info) {
     super(couldNotConvertMessage(value, info));
   }
 
-  public ConversionException(String value, Proper.Ty<?> info, Throwable cause) {
+  public ConversionException(String value, Proper.Info<?> info, Throwable cause) {
     super(couldNotConvertMessage(value, info), cause);
   }
 
@@ -41,7 +41,7 @@ public class ConversionException extends RuntimeException {
     super(message, cause);
   }
 
-  public static String couldNotConvertMessage(String value, Proper.Ty<?> info) {
+  public static String couldNotConvertMessage(String value, Proper.Info<?> info) {
     return couldNotConvertMessage(value, info.getKey(), info.getType().getCanonicalName());
   }
 

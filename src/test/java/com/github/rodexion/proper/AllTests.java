@@ -13,6 +13,6 @@ import org.junit.runners.Suite;
 @SuiteClasses({
         ConverterProviderBuilderTest.class,
         DefaultConvertersTest.class,
-        ProperScenarioTest.class})
+        Examples.class})
 public class AllTests {
 }

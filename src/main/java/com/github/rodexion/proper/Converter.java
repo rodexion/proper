@@ -50,9 +50,13 @@ public interface Converter<T> {
     public Opt<T> asOpt() {
       return Opt.of(value);
     }
+
+    public boolean isFailure() {
+      return !ok && !skip;
+    }
   }
 
   boolean canConvert(Class<?> type);
 
-  Result<T> convert(String value, Proper.Ty<T> info);
+  Result<T> convert(String value, Proper.Info<T> info);
 }

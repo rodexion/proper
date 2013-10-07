@@ -24,6 +24,6 @@ package com.github.rodexion.proper;
  * @author rodexion
  * @since 0.1
  */
-public interface LazyValue<T> {
-  T getValue();
+public interface ValidatorProvider {
+  <T> Validator<T> getValidator(Class<T> forType);
 }

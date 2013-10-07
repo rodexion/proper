@@ -23,6 +23,7 @@ package com.github.rodexion.proper;
 import static com.github.rodexion.proper.ConversionException.couldNotConvertMessage;
 
 import com.github.rodexion.proper.util.Opt;
+import com.github.rodexion.proper.util.PrimitiveTypeUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,8 +33,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author rodexion
@@ -47,57 +46,10 @@ public class Converters {
     }
 
     @Override
-    public Result<Object> convert(String value, Proper.Ty<Object> info) {
+    public Result<Object> convert(String value, Proper.Info<Object> info) {
       return Result.skip();
     }
   };
-
-  private static final ConverterProvider voidConverterProvider = new ConverterProvider() {
-    @Override
-    public <T> Converter<T> getConverter(Class<T> forType) {
-      return voidConverter();
-    }
-  };
-
-  private static final Map<Class<?>, Class<?>> primitiveCounterparts = new HashMap<Class<?>, Class<?>>() {{
-    put(Byte.class, byte.class);
-    put(Short.class, short.class);
-    put(Integer.class, int.class);
-    put(Long.class, long.class);
-    put(Float.class, float.class);
-    put(Double.class, double.class);
-    put(Character.class, char.class);
-  }};
-
-  private static final Map<Class<?>, Converter<?>> basicConverters = new HashMap<Class<?>, Converter<?>>() {
-    {
-      put(String.class, stringConverter());
-      putPrim(Byte.class, byteConverter());
-      putPrim(Short.class, shortConverter());
-      putPrim(Integer.class, intConverter());
-      putPrim(Long.class, longConverter());
-      putPrim(Float.class, floatConverter());
-      putPrim(Double.class, doubleConverter());
-      putPrim(Character.class, characterConverter());
-      put(BigDecimal.class, bigDecimalConverter());
-      put(BigInteger.class, bigIntegerConverter());
-      put(File.class, fileConverter());
-      put(Path.class, pathConverter());
-    }
-
-    private <T> void putPrim(Class<T> typeClass, Converter<T> converter) {
-      put(typeClass, converter);
-      put(getPrimitiveClass(typeClass), converter);
-    }
-  };
-
-  public static ConverterProvider defaultConverterProvider() {
-    return new DefaultConverterProvider();
-  }
-
-  public static ConverterProvider voidConverterProvider() {
-    return voidConverterProvider;
-  }
 
   @SuppressWarnings("unchecked")
   public static <T> Converter<T> voidConverter() {
@@ -107,7 +59,7 @@ public class Converters {
   public static Converter<String> stringConverter() {
     return new BaseConverter<String>(String.class) {
       @Override
-      public String doConvert(String value, Proper.Ty<String> info) {
+      public String doConvert(String value, Proper.Info<String> info) {
         return value;
       }
     };
@@ -193,7 +145,7 @@ public class Converters {
       }
 
       @Override
-      protected Character doConvert(String value, Proper.Ty<Character> info) throws Exception {
+      protected Character doConvert(String value, Proper.Info<Character> info) throws Exception {
         checkNotNull(value, info);
         if (value.equals(" ")) {
           return ' ';
@@ -211,7 +163,7 @@ public class Converters {
   public static Converter<File> fileConverter() {
     return new BaseConverter<File>(File.class) {
       @Override
-      protected File doConvert(String value, Proper.Ty<File> info) throws Exception {
+      protected File doConvert(String value, Proper.Info<File> info) throws Exception {
         checkNotNull(value, info);
         return new File(value);
       }
@@ -221,7 +173,7 @@ public class Converters {
   public static Converter<Path> pathConverter() {
     return new BaseConverter<Path>(Path.class) {
       @Override
-      protected Path doConvert(String value, Proper.Ty<Path> info) throws Exception {
+      protected Path doConvert(String value, Proper.Info<Path> info) throws Exception {
         checkNotNull(value, info);
         return Paths.get(value);
       }
@@ -237,7 +189,7 @@ public class Converters {
 
       @SuppressWarnings("unchecked")
       @Override
-      protected T doConvert(String value, Proper.Ty<T> info) throws Exception {
+      protected T doConvert(String value, Proper.Info<T> info) throws Exception {
         checkNotNull(value, info);
         String v = value.trim().toLowerCase();
         for (T enumValue : info.getType().getEnumConstants()) {
@@ -250,15 +202,10 @@ public class Converters {
     };
   }
 
-  private static void checkNotNull(Object value, Proper.Ty<?> info) {
+  private static void checkNotNull(Object value, Proper.Info<?> info) {
     if (null == value) {
       throw new ConversionException(null, info, new NullPointerException("value is null"));
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <T> Class<T> getPrimitiveClass(Class<T> boxedClass) {
-    return (Class<T>) primitiveCounterparts.get(boxedClass);
   }
 
   @Data
@@ -268,7 +215,7 @@ public class Converters {
 
     NumberBaseConverter(Class<T> typeClass) {
       super(typeClass);
-      this.typeClass2 = Opt.of(getPrimitiveClass(typeClass));
+      this.typeClass2 = Opt.of(PrimitiveTypeUtil.getPrimitiveClass(typeClass));
     }
 
     @Override
@@ -277,7 +224,7 @@ public class Converters {
     }
 
     @Override
-    protected final T doConvert(String value, Proper.Ty<T> info) throws Exception {
+    protected final T doConvert(String value, Proper.Info<T> info) throws Exception {
       checkNotNull(value, info);
       String v = value.trim();
       try {
@@ -291,31 +238,6 @@ public class Converters {
     }
 
     abstract T parseNumber(String value);
-  }
-
-  private static final class DefaultConverterProvider implements ConverterProvider {
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> Converter<T> getConverter(Class<T> forType) {
-      Opt<Converter<T>> converterOpt = getNullableConverter(forType);
-      if (converterOpt.isNone()) {
-        if (Enum.class.isAssignableFrom(forType)) {
-          //noinspection RedundantCast
-          converterOpt = Opt.some((Converter<T>) (Converter) Converters.enumConverter());
-        }
-      }
-      if (!converterOpt.isNone()) {
-        if (converterOpt.get().canConvert(forType)) {
-          return converterOpt.get();
-        }
-      }
-      return Converters.voidConverter();
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> Opt<Converter<T>> getNullableConverter(Class<T> forType) {
-      return Opt.of((Converter<T>) basicConverters.get(forType));
-    }
   }
 
   @Data
@@ -336,7 +258,7 @@ public class Converters {
     }
 
     @Override
-    public Result<T> convert(String value, Proper.Ty<T> info) {
+    public Result<T> convert(String value, Proper.Info<T> info) {
       try {
         return ok(doConvert(value, info));
       } catch (Exception e) {
@@ -348,6 +270,9 @@ public class Converters {
       }
     }
 
-    protected abstract T doConvert(String value, Proper.Ty<T> info) throws Exception;
+    protected abstract T doConvert(String value, Proper.Info<T> info) throws Exception;
+  }
+
+  private Converters() {
   }
 }

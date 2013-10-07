@@ -20,7 +20,11 @@
 
 package com.github.rodexion.proper;
 
+import static com.github.rodexion.proper.util.Preconditions.checkNotNull;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.Map;
 
@@ -30,15 +34,66 @@ import java.util.Map;
  */
 public class Proper {
   @Data
-  public static final class Ty<T> {
+  public static final class Info<T> {
     private final String key;
     private final Class<T> type;
     private final T defaultValue;
     private final Map<String, Object> attributes;
   }
 
-  public static <T> PropertyBuilder<T> ty(String key, T defaultValue) {
-    return new PropertyBuilder<>(key, defaultValue)
-            .converterProvider(Converters.defaultConverterProvider());
+  @AllArgsConstructor
+  public static final class Ty<T> implements LazyValue<T> {
+    @Getter
+    private final Proper.Info<T> info;
+    private final Converter<T> converter;
+    private final Validator<T> validator;
+    private final PropertyListener propertyListener;
+
+    public T getValue() {
+      String value = System.getProperty(info.getKey());
+      if (null == value) {
+        propertyListener.notFound(info);
+        return info.getDefaultValue();
+      }
+      Validator.Result validationBefore = validator.beforeConversion(value, info);
+      if (!validationBefore.isOk()) {
+        propertyListener.validationBeforeConversionFailed(value, validationBefore.getErrorMessage(), info);
+        return info.getDefaultValue();
+      }
+      Converter.Result<T> result = converter.convert(value, info);
+      if (result.isFailure()) {
+        propertyListener.conversionFailed(value, result.getErrorMessage(), info);
+        return info.getDefaultValue();
+      } else if (result.isSkip()) {
+        //Maybe value does not need conversion
+        if (info.getType().isAssignableFrom(String.class)) {
+          return (T) value;
+        } else {
+          propertyListener.conversionFailed(value, "No suitable converter found", info);
+        }
+      }
+      Validator.Result validationAfter = validator.afterConversion(result.getValue(), info);
+      if (!validationAfter.isOk()) {
+        propertyListener.validationAfterConversionFailed(result.getValue(), validationAfter.getErrorMessage(), info);
+        return info.getDefaultValue();
+      }
+      propertyListener.success(value, result.getValue(), info);
+      return result.getValue();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> PropertyBuilder<T> tyBuilder(String key, T defaultValue) {
+    checkNotNull("key", key);
+    checkNotNull("defaultValue", defaultValue);
+    return new PropertyBuilder<>(key, (Class<T>) defaultValue.getClass(), defaultValue)
+            .converterProvider(ConverterProviders.defaultConverterProvider());
+  }
+
+  public static <T> PropertyBuilder<T> tyBuilder(String key, Class<T> typeClass) {
+    return new PropertyBuilder<>(checkNotNull("key", key), checkNotNull("typeClass", typeClass), null);
+  }
+
+  private Proper() {
   }
 }

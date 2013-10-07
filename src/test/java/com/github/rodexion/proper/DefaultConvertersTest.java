@@ -6,6 +6,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import lombok.Data;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 
 /**
@@ -130,6 +131,17 @@ public class DefaultConvertersTest {
             fail("Four", msg("Four", TestEnum.class.getCanonicalName())));
   }
 
+  @Test
+  public void bigDecimalConversion() {
+    checkOk(BigDecimal.class,
+            ok("1", BigDecimal.ONE),
+            ok(" -1.11", new BigDecimal("-1.11")),
+            ok("10e3", new BigDecimal("10e3")));
+
+    checkFailure(BigDecimal.class,
+            fail("xyz", msg("xyz", BigDecimal.class.getCanonicalName())));
+  }
+
   @SafeVarargs
   private final <T> void checkOk(Class<T> typeClass, Class<T> typeClass2,
                                  InputToOk<T>... inputs) {
@@ -169,11 +181,11 @@ public class DefaultConvertersTest {
   }
 
   private <T> Converter<T> conv(Class<T> typeClass) {
-    return Converters.defaultConverterProvider().getConverter(typeClass);
+    return ConverterProviders.defaultConverterProvider().getConverter(typeClass);
   }
 
-  private static <T> Proper.Ty<T> property(Class<T> type) {
-    return new Proper.Ty<>("key", type, null, Collections.<String, Object>emptyMap());
+  private static <T> Proper.Info<T> property(Class<T> type) {
+    return new Proper.Info<>("key", type, null, Collections.<String, Object>emptyMap());
   }
 
   @Data

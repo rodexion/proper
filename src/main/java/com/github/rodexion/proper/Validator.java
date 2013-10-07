@@ -41,7 +41,9 @@ public interface Validator<T> {
     }
   }
 
-  Result beforeConversion(String value);
+  boolean canValidate(Class<?> type);
 
-  Result afterConversion(T value);
+  Result beforeConversion(String value, Proper.Info<T> info);
+
+  Result afterConversion(T value, Proper.Info<T> info);
 }

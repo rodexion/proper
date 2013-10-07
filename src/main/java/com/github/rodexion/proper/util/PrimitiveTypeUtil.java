@@ -18,12 +18,31 @@
  *
  */
 
-package com.github.rodexion.proper;
+package com.github.rodexion.proper.util;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author rodexion
  * @since 0.1
  */
-public interface LazyValue<T> {
-  T getValue();
+public class PrimitiveTypeUtil {
+  private static final Map<Class<?>, Class<?>> primitiveCounterparts = new HashMap<Class<?>, Class<?>>() {{
+    put(Byte.class, byte.class);
+    put(Short.class, short.class);
+    put(Integer.class, int.class);
+    put(Long.class, long.class);
+    put(Float.class, float.class);
+    put(Double.class, double.class);
+    put(Character.class, char.class);
+  }};
+
+  @SuppressWarnings("unchecked")
+  public static <T> Class<T> getPrimitiveClass(Class<T> boxedClass) {
+    return (Class<T>) primitiveCounterparts.get(boxedClass);
+  }
+
+  private PrimitiveTypeUtil() {
+  }
 }

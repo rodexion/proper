@@ -25,9 +25,15 @@ package com.github.rodexion.proper;
  * @since 0.1
  */
 public interface PropertyListener {
-  void notFound(Proper.Ty<?> info);
+  void defined(Proper.Info<?> info);
 
-  void validationFailed(boolean beforeConversion, Validator.Result validationResult, Proper.Ty<?> info);
+  void notFound(Proper.Info<?> info);
 
-  void conversionFailed(Converter.Result<?> validationResult, Proper.Ty<?> info);
+  void validationBeforeConversionFailed(String value, String validationError, Proper.Info<?> info);
+
+  void conversionFailed(String value, String conversionError, Proper.Info<?> info);
+
+  void validationAfterConversionFailed(Object value, String validationError, Proper.Info<?> info);
+
+  void success(String stringValue, Object convertedValue, Proper.Info<?> info);
 }
