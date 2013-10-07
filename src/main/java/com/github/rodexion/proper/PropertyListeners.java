@@ -25,7 +25,13 @@ package com.github.rodexion.proper;
  * @since 0.1
  */
 public class PropertyListeners {
-    private static final PropertyListener voidListener = new PropertyListener() {
+    private static final PropertyListener voidListener = new BasePropertyListener();
+
+    public static PropertyListener voidListener() {
+        return voidListener;
+    }
+
+    public static class BasePropertyListener implements PropertyListener {
         @Override
         public void notFound(Proper.Ty<?> info) {
         }
@@ -37,9 +43,5 @@ public class PropertyListeners {
         @Override
         public void conversionFailed(Converter.Result<?> validationResult, Proper.Ty<?> info) {
         }
-    };
-
-    public static PropertyListener voidListener() {
-        return voidListener;
     }
 }
