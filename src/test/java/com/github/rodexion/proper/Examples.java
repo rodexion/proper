@@ -31,11 +31,11 @@ public class Examples {
      * In the accessor you can set up your own default converters, validators
      * and property listeners.
      */
-    static class MyProper {
+    public static class MyProper {
         static final List<String> messages = new ArrayList<>();
 
         public enum Unit {
-            Int, String
+            Int, Long
         }
 
         public static <T> PropertyBuilder<T> ty(String key, T defaultValue, String description, Unit unit) {
