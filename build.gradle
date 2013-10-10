@@ -40,6 +40,8 @@ configurations {
 dependencies {
   provided 'org.projectlombok:lombok:0.12.0'
 
+  compile 'org.reflections:reflections:0.9.9-RC1'
+
   testCompile 'junit:junit:4.11'
   testCompile 'org.easytesting:fest-assert-core:2.0M10'
 }

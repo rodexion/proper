@@ -20,61 +20,70 @@
 
 package com.github.rodexion.proper;
 
+import static com.github.rodexion.proper.util.Preconditions.checkNotNull;
+
+import com.github.rodexion.proper.bus.InternalBuilderBus;
+import com.github.rodexion.proper.bus.ProperLocation;
+
 import java.util.Collections;
 import java.util.Map;
-
-import static com.github.rodexion.proper.util.Preconditions.checkNotNull;
 
 /**
  * @author rodexion
  * @since 0.1
  */
 public class PropertyBuilder<T> {
-    private final Proper.Info<T> info;
-    private Converter<T> converter = Converters.voidConverter();
-    private Validator<T> validator = Validators.voidValidator();
-    private PropertyListener propertyListener = PropertyListeners.voidListener();
-    private Map<String, Object> attributes = Collections.emptyMap();
+  private final String key;
+  private final Class<T> typeClass;
+  private final T defaultValue;
+  private final ProperLocation location;
+  private Converter<T> converter = Converters.voidConverter();
+  private Validator<T> validator = Validators.voidValidator();
+  private PropertyListener propertyListener = PropertyListeners.voidListener();
+  private Map<String, Object> attributes = Collections.emptyMap();
 
-    PropertyBuilder(String key, Class<T> typeClass, T defaultValue) {
-        this.info = new Proper.Info<>(key,
-                typeClass,
-                defaultValue,
-                attributes);
-    }
+  PropertyBuilder(String key, Class<T> typeClass, T defaultValue) {
+    this.key = key;
+    this.typeClass = typeClass;
+    this.defaultValue = defaultValue;
+    this.location = ProperLocation.getCurrentDeclarationLocation();
+  }
 
-    public PropertyBuilder<T> converter(Converter<T> converter) {
-        this.converter = checkNotNull("converter", converter);
-        return this;
-    }
+  public PropertyBuilder<T> converter(Converter<T> converter) {
+    this.converter = checkNotNull("converter", converter);
+    return this;
+  }
 
-    public PropertyBuilder<T> converterProvider(ConverterProvider converterProvider) {
-        this.converter = checkNotNull("converterProvider", converterProvider).getConverter(info.getType());
-        return this;
-    }
+  public PropertyBuilder<T> converterProvider(ConverterProvider converterProvider) {
+    this.converter = checkNotNull("converterProvider", converterProvider).getConverter(typeClass);
+    return this;
+  }
 
-    public PropertyBuilder<T> validator(Validator<T> validator) {
-        this.validator = checkNotNull("validator", validator);
-        return this;
-    }
+  public PropertyBuilder<T> validator(Validator<T> validator) {
+    this.validator = checkNotNull("validator", validator);
+    return this;
+  }
 
 
-    public PropertyBuilder<T> validatorProvider(ValidatorProvider validatorProvider) {
-        this.validator = checkNotNull("validatorProvider", validatorProvider).getValidator(info.getType());
-        return this;
-    }
+  public PropertyBuilder<T> validatorProvider(ValidatorProvider validatorProvider) {
+    this.validator = checkNotNull("validatorProvider", validatorProvider).getValidator(typeClass);
+    return this;
+  }
 
-    public PropertyBuilder<T> propertyListener(PropertyListener propertyListener) {
-        this.propertyListener = checkNotNull("propertyListener", propertyListener);
-        return this;
-    }
+  public PropertyBuilder<T> propertyListener(PropertyListener propertyListener) {
+    this.propertyListener = checkNotNull("propertyListener", propertyListener);
+    return this;
+  }
 
-    public PropertyBuilder<T> attributes(Map<String, Object> attributes) {
-        this.attributes = checkNotNull("attributes", attributes);
-        return this;
-    }
+  public PropertyBuilder<T> attributes(Map<String, Object> attributes) {
+    this.attributes = checkNotNull("attributes", attributes);
+    return this;
+  }
 
-    public Proper.Ty<T> build() {
-        return new Proper.Ty<>(info, converter, validator, propertyListener, attributes);
-    }
+  public Proper.Ty<T> build() {
+    Proper.Ty<T> property = new Proper.Ty<>(new Proper.Info<>(key, typeClass, defaultValue, attributes),
+            converter, validator, propertyListener);
+    InternalBuilderBus.firePropertyBuilt(property, location);
+    return property;
+  }
 }

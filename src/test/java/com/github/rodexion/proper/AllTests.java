@@ -2,6 +2,7 @@ package com.github.rodexion.proper;
 
 import static org.junit.runners.Suite.SuiteClasses;
 
+import com.github.rodexion.proper.scanner.AllScannerTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -11,6 +12,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
+        AllScannerTests.class,
         ConverterProviderBuilderTest.class,
         DefaultConvertersTest.class,
         Examples.class})

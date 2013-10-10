@@ -1,4 +1,4 @@
-package com.github.rodexion.proper.tools;
+package com.github.rodexion.proper.scanner;
 
 import com.github.rodexion.proper.Examples;
 import com.github.rodexion.proper.LazyValue;
