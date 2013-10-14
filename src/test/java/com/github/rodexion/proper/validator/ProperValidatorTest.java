@@ -2,6 +2,7 @@ package com.github.rodexion.proper.validator;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import com.github.rodexion.proper.TestConstants;
 import com.github.rodexion.proper.RuleUtils;
 import org.fest.assertions.core.Condition;
 import org.junit.Rule;
@@ -17,8 +18,9 @@ public class ProperValidatorTest {
   public TestRule tmpProps = RuleUtils.tmpSysProp(MyValidatedConstants.invalidIntProp);
 
   @Test
-  public void test() {
-    ProperValidator validator = ProperValidators.validator("com.github.rodexion");
+  public void allPropertiesThatDoNotPassValidationAreGathered() {
+    ProperValidators.validateAll("com.github.rodexion").validate();
+    ProperValidator validator = ProperValidators.validator(TestConstants.PROPER_BASE_PACKAGE);
 
     System.setProperty(MyValidatedConstants.invalidIntProp, "123123");
     ValidationResult withErrors = validator.validate();

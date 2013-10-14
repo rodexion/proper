@@ -10,6 +10,7 @@ import org.junit.runners.Suite;
  * @since 0.1
  */
 @RunWith(Suite.class)
-@SuiteClasses(ProperValidatorTest.class)
+@SuiteClasses({ProperValidatorTest.class,
+        NonAnnotatedFieldsScanTest.class})
 public class AllValidatorTests {
 }

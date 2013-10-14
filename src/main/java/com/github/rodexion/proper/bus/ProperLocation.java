@@ -26,6 +26,5 @@ public class ProperLocation {
     String properRootPkgName = Proper.class.getPackage().getName();
     return elem.getClassName().startsWith(properRootPkgName) &&
             !elem.getMethodName().equals("<clinit>");
-
   }
 }

@@ -22,10 +22,7 @@ package com.github.rodexion.proper;
 
 import static com.github.rodexion.proper.util.Preconditions.checkNotNull;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Map;
 
@@ -34,7 +31,14 @@ import java.util.Map;
  * @since 0.1
  */
 public class Proper {
+  /**
+   * <p>Note: Hash code and equals implementations are only based on the
+   * {@link #key} value.</p>
+   *
+   * @param <T>
+   */
   @Data
+  @EqualsAndHashCode(of = {"key"})
   public static final class Info<T> {
     private final String key;
     private final Class<T> type;
@@ -42,8 +46,15 @@ public class Proper {
     private final Map<String, Object> attributes;
   }
 
+  /**
+   * <p>Note: Hash code and equals implementations are only based on the {@link #info},
+   * which in turn is only based on its {@link Info#key} field.</p>
+   *
+   * @param <T>
+   */
   @AllArgsConstructor
   @ToString
+  @EqualsAndHashCode(of = {"info"})
   public static final class Ty<T> implements LazyValue<T> {
     @Getter
     private final Proper.Info<T> info;

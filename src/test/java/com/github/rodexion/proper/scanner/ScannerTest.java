@@ -16,7 +16,7 @@ import org.junit.Test;
 public class ScannerTest {
   @Test
   public void scan() {
-    ScanResult result = ProperScanners.scanner("com.github.rodexion.proper.scanner").scan();
+    ScanResult result = ProperScanners.scanner(ProperScanners.class.getPackage().getName()).scan();
     assertThat(result.getDeclarations()).hasSize(3)
             .haveExactly(1, declOf("test.prop.int", MyConstants.intPropLineNumber))
             .haveExactly(1, declOf("test.prop.lazyLong", MyConstants.lazyLongPropLineNumber))
