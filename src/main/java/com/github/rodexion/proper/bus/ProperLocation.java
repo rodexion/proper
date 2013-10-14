@@ -1,5 +1,6 @@
 package com.github.rodexion.proper.bus;
 
+import com.github.rodexion.proper.Proper;
 import lombok.Data;
 
 /**
@@ -14,7 +15,6 @@ public class ProperLocation {
 
   public static ProperLocation getCurrentDeclarationLocation() {
     for (StackTraceElement elem : new Exception().getStackTrace()) {
-      System.out.println(elem);
       if (!frameWorkElem(elem)) {
         return new ProperLocation(elem.getFileName(), elem.getLineNumber());
       }
@@ -23,8 +23,9 @@ public class ProperLocation {
   }
 
   private static boolean frameWorkElem(StackTraceElement elem) {
-    return !elem.getMethodName().equals("<clinit>");
-//    String properRootPkgName = Proper.class.getPackage().getName();
-//    return elem.getClassName().startsWith(properRootPkgName);
+    String properRootPkgName = Proper.class.getPackage().getName();
+    return elem.getClassName().startsWith(properRootPkgName) &&
+            !elem.getMethodName().equals("<clinit>");
+
   }
 }

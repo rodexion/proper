@@ -3,11 +3,8 @@ package com.github.rodexion.proper.scanner;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import com.github.rodexion.proper.Proper;
 import org.fest.assertions.core.Condition;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * ScannerTest
@@ -19,19 +16,20 @@ import java.util.List;
 public class ScannerTest {
   @Test
   public void scan() {
-    List<Proper.Ty<?>> result = ProperScanners.scanner("com.github.rodexion").scan();
-    assertThat(result).hasSize(2)
-            .haveExactly(1, new Condition<Proper.Ty<?>>() {
-              @Override
-              public boolean matches(Proper.Ty<?> value) {
-                return value.getInfo().getKey().equals("test.prop.int");
-              }
-            })
-            .haveExactly(1, new Condition<Proper.Ty<?>>() {
-              @Override
-              public boolean matches(Proper.Ty<?> value) {
-                return value.getInfo().getKey().equals("test.prop.lazyLong");
-              }
-            });
+    ScanResult result = ProperScanners.scanner("com.github.rodexion.proper.scanner").scan();
+    assertThat(result.getDeclarations()).hasSize(3)
+            .haveExactly(1, declOf("test.prop.int", MyConstants.intPropLineNumber))
+            .haveExactly(1, declOf("test.prop.lazyLong", MyConstants.lazyLongPropLineNumber))
+            .haveExactly(1, declOf("test.float.prop", MyPropeties2.floatPropLineNumber));
+  }
+
+  private static Condition<ProperDecl> declOf(final String key, final int locatedAtLine) {
+    return new Condition<ProperDecl>() {
+      @Override
+      public boolean matches(ProperDecl value) {
+        return value.getLocation().getLineNumber() == locatedAtLine &&
+                value.getProperty().getInfo().getKey().equals(key);
+      }
+    };
   }
 }

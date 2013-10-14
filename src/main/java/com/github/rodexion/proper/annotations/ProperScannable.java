@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * @version X.0
  * @since 2013/10/08
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ProperScannable {
 }

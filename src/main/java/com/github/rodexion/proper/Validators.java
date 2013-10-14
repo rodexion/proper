@@ -83,7 +83,7 @@ public class Validators {
   }
 
   public static <T extends Comparable<T>> ComparableValidatorBuilder<T> comparableValidatorBuilder() {
-    return new ComparableValidatorBuilder();
+    return new ComparableValidatorBuilder<>();
   }
 
   public static final class ComparableValidatorBuilder<T extends Comparable<T>> {

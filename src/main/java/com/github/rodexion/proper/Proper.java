@@ -25,6 +25,7 @@ import static com.github.rodexion.proper.util.Preconditions.checkNotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Map;
 
@@ -42,6 +43,7 @@ public class Proper {
   }
 
   @AllArgsConstructor
+  @ToString
   public static final class Ty<T> implements LazyValue<T> {
     @Getter
     private final Proper.Info<T> info;

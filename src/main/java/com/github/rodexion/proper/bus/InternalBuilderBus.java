@@ -1,23 +1,23 @@
 package com.github.rodexion.proper.bus;
 
 import com.github.rodexion.proper.Proper;
+import com.github.rodexion.proper.scanner.ProperDecl;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author rodexion
  * @since 0.1
  */
 public class InternalBuilderBus {
-  private static final Map<Proper.Ty<?>, ProperLocation> properties = new HashMap<>();
+  private static final List<ProperDecl> properties = new ArrayList<>();
 
   public static void firePropertyBuilt(Proper.Ty<?> info, ProperLocation location) {
-    System.out.println("Fired" + InternalBuilderBus.class.getClassLoader());
-    properties.put(info, location);
+    properties.add(new ProperDecl(info, location));
   }
 
-  public static Map<Proper.Ty<?>, ProperLocation> getFoundProperties() {
-    return new HashMap<>(properties);
+  public static List<ProperDecl> getFoundProperties() {
+    return new ArrayList<>(properties);
   }
 }

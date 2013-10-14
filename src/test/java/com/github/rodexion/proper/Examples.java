@@ -35,7 +35,7 @@ public class Examples {
     static final List<String> messages = new ArrayList<>();
 
     public enum Unit {
-      Int, Long
+      Int, Long, Float
     }
 
     public static <T> PropertyBuilder<T> ty(String key, T defaultValue, String description, Unit unit) {
