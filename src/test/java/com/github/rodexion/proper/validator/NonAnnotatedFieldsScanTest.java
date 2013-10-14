@@ -22,8 +22,8 @@ package com.github.rodexion.proper.validator;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import com.github.rodexion.proper.TestConstants;
 import com.github.rodexion.proper.SeparateClassLoaderTestRunner;
+import com.github.rodexion.proper.TestConstants;
 import org.fest.assertions.core.Condition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
