@@ -38,9 +38,7 @@ Custom Validation and Listening
 
 You can inject custom validation logic for your validation. In order to
 do this, you're encouraged to create your own property builder class instead
-of directly using the one in `Proper` class. 
-
-Here I have created `MyProper.ty` builder:
+of directly using the one in `Proper` class:
 
 ```java
 public static class MyProper {
@@ -117,7 +115,7 @@ Here's how to use the scanner:
   }
 ```
 
-The above will also give you access to access to any custom attributes
+The above will also give you access to all custom attributes
 defined on the properties, so you can build comprehensive database of all
 your system proprerites. Can be useful when debugging, generating manuals,
 creating propery diffs between different versions of your application, etc.
@@ -144,7 +142,7 @@ And here's how to run a validator:
 Using `ProperValidators.validateAll()` will also attempt to detect and
 warn about any properties missing the `@ProperScannable` annotation, but
 running it may be costly as it will attempt to statically load all classes
-in the given package, therefore it is designed to be mainly used from tests.
+in the given package. Therefore the tool is designed to be mainly used from tests.
 
 Scanner leverages [reflections](http://code.google.com/p/reflections/ "Reflections") library to perform the scanning.
 
