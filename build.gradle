@@ -50,6 +50,9 @@ sourceSets {
   main {
     compileClasspath += configurations.provided
   }
+  test {
+    compileClasspath += configurations.provided
+  }
 }
 
 idea {
