@@ -27,11 +27,15 @@ import lombok.*;
 import java.util.Map;
 
 /**
+ * <p>Static factory for properties. Use {@link Proper#tyBuilder(String, Class)}
+ * to create and configure property instances.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 public class Proper {
   /**
+   * <p>Basic property information holder</p>
    * <p>Note: Hash code and equals implementations are only based on the
    * {@link #key} value.</p>
    *
@@ -40,9 +44,21 @@ public class Proper {
   @Data
   @EqualsAndHashCode(of = {"key"})
   public static final class Info<T> {
+    /**
+     * <p>Unique property key (not-null)</p>
+     */
     private final String key;
+    /**
+     * <p>Property type (not-null)</p>
+     */
     private final Class<T> type;
+    /**
+     * <p>Default value used when property is not set, or conversion/validation has failed (maybe null)</p>
+     */
     private final T defaultValue;
+    /**
+     * <p>Custom property attributes (not-null)</p>
+     */
     private final Map<String, Object> attributes;
   }
 
@@ -56,16 +72,38 @@ public class Proper {
   @ToString
   @EqualsAndHashCode(of = {"info"})
   public static final class Ty<T> implements LazyValue<T> {
+    /**
+     * <p>Basic property information (not-null)</p>
+     */
     @Getter
     private final Proper.Info<T> info;
     private final Converter<T> converter;
     private final Validator<T> validator;
     private final PropertyListener propertyListener;
 
+    /**
+     * <p>Retrieves the current system property value, after applying
+     * any conversion and/or validation rules declared (maybe null)</p>
+     * <p>Failure to find the appropriate converter for this
+     * property type, or to validate the property will return the
+     * default value (see {@link com.github.rodexion.proper.Proper.Info#getDefaultValue()})</p>
+     *
+     * @return Current value for this system property, or the default value
+     */
     public T getValue() {
       return getValue(propertyListener);
     }
 
+    /**
+     * <p>Retrieves the current system property value, after applying
+     * any conversion and/or validation rules declared (maybe null)</p>
+     * <p>Failure to find the appropriate converter for this
+     * property type, or to validate the property will return the
+     * default value (see {@link com.github.rodexion.proper.Proper.Info#getDefaultValue()})</p>
+     *
+     * @param propertyListener property listener to use
+     * @return Current value for this system property, or the default value
+     */
     public T getValue(PropertyListener propertyListener) {
       String value = System.getProperty(info.getKey());
       if (null == value) {
@@ -99,6 +137,18 @@ public class Proper {
     }
   }
 
+  /**
+   * <p>Initialises basic system property builder, pre-configured with
+   * the default converter set (see {@link com.github.rodexion.proper.ConverterProviders#defaultConverterProvider()}</p>
+   * <p/>
+   * <p>If you wish to use a <code>null</code> for the default value, use the {@link #tyBuilder(String, Class)} static
+   * constructor</p>
+   *
+   * @param key          Unique system property key (not null)
+   * @param defaultValue Default value to fall back to on missing property or conversion/validation failure (not null)
+   * @param <T>          Property type
+   * @return Property builder object
+   */
   @SuppressWarnings("unchecked")
   public static <T> PropertyBuilder<T> tyBuilder(String key, T defaultValue) {
     checkNotNull("key", key);
@@ -107,6 +157,16 @@ public class Proper {
             .converterProvider(ConverterProviders.defaultConverterProvider());
   }
 
+  /**
+   * <p>Initialises basic system property builder, with a <code>null</code> default value, pre-configured with
+   * the default converter set (see {@link com.github.rodexion.proper.ConverterProviders#defaultConverterProvider()}</p>
+   * <p/>
+   *
+   * @param key       Unique system property key (not null)
+   * @param typeClass Property type class (not null)
+   * @param <T>       Property type
+   * @return Property builder object
+   */
   public static <T> PropertyBuilder<T> tyBuilder(String key, Class<T> typeClass) {
     return new PropertyBuilder<>(checkNotNull("key", key), checkNotNull("typeClass", typeClass), null);
   }
