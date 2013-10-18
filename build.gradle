@@ -28,6 +28,11 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'idea-utils'
+apply plugin: 'maven'
+
+group = "io.github.rodexion"
+version = "0.1-SNAPSHOT"
+archivesBaseName = "proper"
 
 repositories {
   mavenCentral()
@@ -46,6 +51,9 @@ dependencies {
   testCompile 'org.easytesting:fest-assert-core:2.0M10'
 }
 
+sourceCompatibility = '1.7'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
 sourceSets {
   main {
     compileClasspath += configurations.provided
@@ -54,6 +62,62 @@ sourceSets {
     compileClasspath += configurations.provided
   }
 }
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+artifacts {
+  archives jar
+  archives javadocJar
+  archives sourcesJar
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      repository(url: project.releaseRepoUrl)
+      snapshotRepository(url: project.snapshotRepoUrl)
+      pom.project {
+        artifactId = project.archivesBaseName
+        name 'proper'
+        inceptionYear '2013'
+        packaging 'jar'
+        description 'Utility for acquiring, validating and managing java system properties'
+        url 'https://github.com/rodexion/proper'
+
+        scm {
+          url 'scm:git@github.com:rodexion/proper.git'
+          connection 'scm:git@github.com:rodexion/proper.git'
+          developerConnection 'scm:git@github.com:rodexion/proper.git'
+        }
+
+        licenses {
+          license {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+          }
+        }
+
+        developers {
+          developer {
+            id 'rodexion'
+            name 'Rodion Moiseev'
+            email 'rodion.moiseev+github@gmail.com'
+          }
+        }
+      }
+    }
+  }
+}
+
 
 idea {
   project {
