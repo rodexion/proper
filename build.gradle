@@ -63,6 +63,32 @@ sourceSets {
   }
 }
 
+def srcDelomboked = 'build/src-delomboked'
+
+task delombok {
+  // delombok task may depend on other projects already being compiled
+  dependsOn configurations.compile.getTaskDependencyFromProjectDependency(true, "compileJava")
+
+  def srcJava = 'src/main/java'
+
+  // Set up incremental build, must be made in the configuration phase (not doLast)
+  inputs.files file(srcJava)
+  outputs.dir file(srcDelomboked)
+
+  doLast {
+    def cp = configurations.compile + configurations.provided
+    def collection = files(cp)
+    def sumTree = collection + fileTree(dir: 'bin')
+
+    ant.taskdef(name: 'delombok', classname: 'lombok.delombok.ant.DelombokTask', classpath: cp.asPath)
+    ant.delombok(from: srcJava, to: srcDelomboked, classpath: sumTree.asPath)
+  }
+}
+
+javadoc.source = file(srcDelomboked)
+javadoc.dependsOn delombok
+javadoc.classpath += configurations.provided
+
 task javadocJar(type: Jar, dependsOn: javadoc) {
   classifier = 'javadoc'
   from 'build/docs/javadoc'
