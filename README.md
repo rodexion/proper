@@ -129,7 +129,7 @@ And here's how to run a validator:
     //with @ProperScannable annotation will be validated.
     ProperValidator validator = ProperValidators.validator("com.myApp");
 
-    //Run the valitation
+    //Run the validation
     ValidationResult result = validator.validate();
 
     //All errors contain a relatively descriptive validation error message
