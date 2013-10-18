@@ -21,9 +21,17 @@
 package com.github.rodexion.proper;
 
 /**
+ * <p>A lazy property provider interface, implemented by {@link Proper.Ty}.
+ * System property value will be re-evaluated every on every call.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 public interface LazyValue<T> {
+  /**
+   * <p>Reevaluate and retrieve system property value</p>
+   *
+   * @return Current value of the system property
+   */
   T getValue();
 }
