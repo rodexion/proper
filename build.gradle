@@ -31,7 +31,7 @@ apply plugin: 'idea-utils'
 apply plugin: 'maven'
 
 group = "io.github.rodexion"
-version = "0.1-SNAPSHOT"
+version = "0.1"
 archivesBaseName = "proper"
 
 repositories {
