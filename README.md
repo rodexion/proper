@@ -49,14 +49,16 @@ public static class MyProper {
       //Register a custom property listener
      .propertyListener(new PropertyListeners.BasePropertyListener() {
         @Override
-        public void conversionFailed(String value, 
+        public void conversionFailed(String key,
+                                     String value, 
                                      String conversionError, 
                                     Proper.Info<?> info) {
           errors.add("Could not convert " + value + " to int");
         }
 
         @Override
-        public void validationAfterConversionFailed(Object value, 
+        public void validationAfterConversionFailed(String key,
+                                                    Object value, 
                                                     String validationError, 
                                                     Proper.Info<?> info) {
           errors.add(validationError);
@@ -66,7 +68,7 @@ public static class MyProper {
      .validatorProvider(ValidatorProviders.builder()
        .add(new Validators.BaseValidator<Integer>(Integer.class) {
          @Override
-         public Result afterConversion(Integer value, Proper.Info<Integer> info) {
+         public Result afterConversion(String key, Integer value, Proper.Info<Integer> info) {
            return 0 < value && value < 100 ? ok() : fail("0 < x < 100 is not satisfied");
          }
        }).build()
