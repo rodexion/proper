@@ -173,6 +173,28 @@ public static class MyProper {
 }
 ```
 
+Using proper In Your Project
+==============================
+
+`proper` is available as a Maven dependency from the below repository:
+
+```
+https://raw.github.com/rodionmoiseev/maven-repo/master/repo/releases
+```
+
+To include `proper` in Gradle, use the setting below:
+
+```groovy
+repositories {
+  maven {
+    url "https://raw.github.com/rodionmoiseev/maven-repo/master/repo/releases"
+  }
+}
+
+dependencies {
+  compile 'io.github.rodexion:proper:0.1'
+}
+```
 
 Notes on the Design Decisions
 =============================
