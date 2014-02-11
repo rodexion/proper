@@ -21,9 +21,24 @@
 package com.github.rodexion.proper;
 
 /**
+ * <p>Provides converter instance for the specifies
+ * conversion target type.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 public interface ConverterProvider {
+  /**
+   * <p>Creates a converter instance for the specifies
+   * conversion target type.</p>
+   * <p>When no appropriate converter is available an instance of
+   * {@link com.github.rodexion.proper.Converters#voidConverter()}
+   * should be returned, instead of <code>null</code>.
+   * </p>
+   *
+   * @param forType Conversion target type class
+   * @param <T>     Conversion target type
+   * @return Converter instance (not-null)
+   */
   <T> Converter<T> getConverter(Class<T> forType);
 }

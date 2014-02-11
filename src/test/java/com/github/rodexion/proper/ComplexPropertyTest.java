@@ -18,26 +18,32 @@
  *
  */
 
-package com.github.rodexion.proper.scanner;
+package com.github.rodexion.proper;
 
-import com.github.rodexion.proper.Proper;
-import com.github.rodexion.proper.bus.ProperLocation;
-import lombok.Data;
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
 
 /**
- * <p>Represents one property declaration detected in source code by the scanner.</p>
- *
  * @author rodexion
  * @since 0.1
  */
-@Data
-public class ProperDecl {
-  /**
-   * <p>Property declarations parameters.</p>
-   */
-  private final Proper.Ty<?> property;
-  /**
-   * <p>Property location meta data.</p>
-   */
-  private final ProperLocation location;
+public class ComplexPropertyTest {
+  @Rule
+  public TestRule tmpProps = RuleUtils.tmpSysProp("my.key.test1", "my.key.test2");
+
+  @Test
+  public void propertiesCanAcceptSubstitutions() {
+    System.setProperty("my.key.test1", "value1");
+    System.setProperty("my.key.test2", "value2");
+
+    Proper.Ty<String> prop = Proper.tyBuilder("my.key.{0}", "default").build();
+    assertThat(prop.getValue()).isEqualTo("default");
+    assertThat(prop.getValue("test1")).isEqualTo("value1");
+    assertThat(prop.getValue("test2")).isEqualTo("value2");
+    assertThat(prop.getValue("does-not-exist")).isEqualTo("default");
+    assertThat(prop.getValue(123)).isEqualTo("default");
+  }
 }

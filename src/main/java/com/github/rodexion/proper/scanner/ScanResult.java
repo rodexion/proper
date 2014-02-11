@@ -25,11 +25,19 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * <p>Scanner result.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 @Data
 public class ScanResult {
+  /**
+   * <p>List of all property declarations found.</p>
+   */
   private final List<ProperDecl> declarations;
+  /**
+   * <p>List of any exceptions encountered during the scan, if any.</p>
+   */
   private final List<Exception> errors;
 }

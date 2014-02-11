@@ -34,7 +34,7 @@ public class ConverterProviderBuilderTest {
   @Test
   public void empty() {
     assertThat(ConverterProviders.builder().build()
-            .getConverter(Integer.class).convert("any", property("key", Integer.class)))
+            .getConverter(Integer.class).convert("key", "any", property("key", Integer.class)))
             .isEqualTo(Converter.Result.<Integer>skip());
   }
 
@@ -48,12 +48,12 @@ public class ConverterProviderBuilderTest {
               }
 
               @Override
-              public Result<String> convert(String value, Proper.Info<String> info) {
+              public Result<String> convert(String key, String value, Proper.Info<String> info) {
                 return Result.ok("ok");
               }
             })
             .build()
-            .getConverter(String.class).convert("any", property("key", String.class)))
+            .getConverter(String.class).convert("key", "any", property("key", String.class)))
             .isEqualTo(Converter.Result.ok("ok"));
   }
 
@@ -68,13 +68,13 @@ public class ConverterProviderBuilderTest {
               }
 
               @Override
-              public Result<Object> convert(String value, Proper.Info<Object> info) {
+              public Result<Object> convert(String key, String value, Proper.Info<Object> info) {
                 return Result.fail("fallback");
               }
             }).build();
-    assertThat(cp.getConverter(Integer.class).convert("123", property("key", Integer.class)))
+    assertThat(cp.getConverter(Integer.class).convert("key", "123", property("key", Integer.class)))
             .isEqualTo(Converter.Result.ok(123));
-    assertThat(cp.getConverter(String.class).convert("123", property("key", String.class)))
+    assertThat(cp.getConverter(String.class).convert("key", "123", property("key", String.class)))
             .isEqualTo(Converter.Result.<String>fail("fallback"));
   }
 
@@ -89,13 +89,13 @@ public class ConverterProviderBuilderTest {
               }
 
               @Override
-              public Result<Object> convert(String value, Proper.Info<Object> info) {
+              public Result<Object> convert(String key, String value, Proper.Info<Object> info) {
                 return Result.fail("fallback");
               }
             }).build();
-    assertThat(cp.getConverter(Float.class).convert("12.3", property("key", Float.class)))
+    assertThat(cp.getConverter(Float.class).convert("key", "12.3", property("key", Float.class)))
             .isEqualTo(Converter.Result.ok(12.3f));
-    assertThat(cp.getConverter(Object.class).convert("oops", property("key", Object.class)))
+    assertThat(cp.getConverter(Object.class).convert("key", "oops", property("key", Object.class)))
             .isEqualTo(Converter.Result.fail("fallback"));
   }
 

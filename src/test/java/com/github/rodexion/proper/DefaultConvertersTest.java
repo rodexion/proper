@@ -173,7 +173,7 @@ public class DefaultConvertersTest {
   private final <T> void checkOk(Class<T> typeClass,
                                  InputToOk<T>... inputs) {
     for (InputToOk<T> input : inputs) {
-      assertThat(conv(typeClass).convert(input.getInput(), property(typeClass)))
+      assertThat(conv(typeClass).convert("key", input.getInput(), property(typeClass)))
               .isEqualTo(Converter.Result.ok(input.getExpected()));
     }
   }
@@ -187,7 +187,7 @@ public class DefaultConvertersTest {
   private <T> void checkFailure(Class<T> typeClass,
                                 InputToFailure... inputs) {
     for (InputToFailure input : inputs) {
-      assertThat(conv(typeClass).convert(input.getInput(), property(typeClass)))
+      assertThat(conv(typeClass).convert("key", input.getInput(), property(typeClass)))
               .is(Conditions.<T>convertFailure(input.getErrorContains()));
     }
   }

@@ -35,6 +35,7 @@ import org.junit.runners.Suite;
 @SuiteClasses({
         AllScannerTests.class,
         AllValidatorTests.class,
+        ComplexPropertyTest.class,
         ConverterProviderBuilderTest.class,
         DefaultConvertersTest.class,
         Examples.class})

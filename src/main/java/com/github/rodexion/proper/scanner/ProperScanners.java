@@ -41,14 +41,33 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * <p>A collection of default scanner implementations.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 public class ProperScanners {
+  /**
+   * <p>Create a scanner for all property declarations under the specified package,
+   * including sub-packages.</p>
+   * <p>Scanner only searches for classes annotated with {@link ProperScannable}.</p>
+   *
+   * @param basePackage Package to scan under (not-null)
+   * @return Property scanner object (not-null)
+   */
   public static ProperScanner scanner(String basePackage) {
     return new ProperScannableScanner(checkNotNull("basePackage", basePackage));
   }
 
+  /**
+   * <p>Create a scanner for all property declarations under the specified package,
+   * including sub-packages.</p>
+   * <p>Scanner only searches for classes in the whole classpath, in contrast to {@link #scanner(String)}.
+   * This scanner is therefore uses more resources, and should be used sparingly.</p>
+   *
+   * @param basePackage Package to scan under (not-null)
+   * @return Property scanner object (not-null)
+   */
   public static ProperScanner scanAll(String basePackage) {
     return new AllClassesScanner(checkNotNull("basePackage", basePackage));
   }

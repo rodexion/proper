@@ -29,6 +29,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
+import java.text.MessageFormat;
+
 /**
  * @author rodexion
  * @since 0.1
@@ -44,20 +46,33 @@ public class ProperValidatorTest {
 
     System.setProperty(MyValidatedConstants.invalidIntProp, "123123");
     ValidationResult withErrors = validator.validate();
-    assertThat(withErrors.getValidationErrors())
-            .hasSize(1)
-            .haveExactly(1, new Condition<ValidationResult.Error>() {
-              @Override
-              public boolean matches(ValidationResult.Error value) {
-                return value.getErrorMessage().equals("123123 is greater than 500") &&
-                        value.getLocation().getLineNumber() == MyValidatedConstants.invalidIntLineNumber;
-              }
-            });
+    assertThat(withErrors.getValidationErrors()).haveExactly(1, intPropCondition());
 
     System.setProperty(MyValidatedConstants.invalidIntProp, "123");
-    assertThat(validator.validate().getValidationErrors()).hasSize(0);
+    assertThat(validator.validate().getValidationErrors()).doNotHave(intPropCondition());
 
     System.clearProperty(MyValidatedConstants.invalidIntProp);
-    assertThat(validator.validate().getValidationErrors()).hasSize(0);
+    assertThat(validator.validate().getValidationErrors()).doNotHave(intPropCondition());
+
+    final String complexProp1 = MessageFormat.format(MyValidatedConstants.complexProp, "test1");
+    final String complexProp2 = MessageFormat.format(MyValidatedConstants.complexProp, "test2");
+    System.setProperty(complexProp1, "complex-value");
+    assertThat(validator.validate().getValidationErrors()).haveExactly(1, new Condition<ValidationResult.Error>() {
+      @Override
+      public boolean matches(ValidationResult.Error value) {
+        as("sorry no prop found: " + complexProp2);
+        return value.getErrorMessage().equals("sorry no prop found: " + complexProp2);
+      }
+    });
+  }
+
+  private Condition<ValidationResult.Error> intPropCondition() {
+    return new Condition<ValidationResult.Error>() {
+      @Override
+      public boolean matches(ValidationResult.Error value) {
+        return value.getErrorMessage().equals("123123 is greater than 500") &&
+                value.getLocation().getLineNumber() == MyValidatedConstants.invalidIntLineNumber;
+      }
+    };
   }
 }

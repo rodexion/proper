@@ -33,5 +33,5 @@ public interface LazyValue<T> {
    *
    * @return Current value of the system property
    */
-  T getValue();
+  T getValue(Object... args);
 }

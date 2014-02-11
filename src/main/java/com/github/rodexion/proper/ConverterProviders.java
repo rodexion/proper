@@ -29,12 +29,11 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
+ * <p>A collection of default converter provider implementations.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
@@ -68,14 +67,31 @@ public class ConverterProviders {
     }
   };
 
+  /**
+   * <p>Provides converters for the basic known Java types.</p>
+   *
+   * @return Converter provider object (not-null)
+   */
   public static ConverterProvider defaultConverterProvider() {
     return new DefaultConverterProvider();
   }
 
+  /**
+   * <p>Provides void converter.</p>
+   *
+   * @return Converter object (not-null)
+   * @see com.github.rodexion.proper.Converters#voidConverter()
+   */
+  @SuppressWarnings("UnusedDeclaration")
   public static ConverterProvider voidConverterProvider() {
     return voidConverterProvider;
   }
 
+  /**
+   * <p>Creates new converter builder.</p>
+   *
+   * @return Converter builder object (not-null)
+   */
   public static Builder builder() {
     return new Builder();
   }
@@ -107,6 +123,11 @@ public class ConverterProviders {
     }
   }
 
+  /**
+   * <p>A tool for creating a chain of converters.</p>
+   *
+   * @see #builder()
+   */
   public static class Builder {
     private final List<ConverterProvider> converterProviders = new ArrayList<>();
     private final List<Converter<?>> converters = new ArrayList<>();
@@ -114,16 +135,35 @@ public class ConverterProviders {
     Builder() {
     }
 
+    /**
+     * <p>Adds given converter to the chain. Conversion will be processed in
+     * order of addition.</p>
+     *
+     * @param converter Converter object (not-null)
+     * @return this builder instance (not-null)
+     */
     public Builder add(Converter<?> converter) {
       converters.add(checkNotNull("converter", converter));
       return this;
     }
 
+    /**
+     * <p>Adds all converters from the given provider to the chain. Conversion will be processed in
+     * order of addition.</p>
+     *
+     * @param converterProvider Converter provider object (not-null)
+     * @return this builder instance (not-null)
+     */
     public Builder allFrom(ConverterProvider converterProvider) {
       converterProviders.add(checkNotNull("converterProvider", converterProvider));
       return this;
     }
 
+    /**
+     * <p>Create a converter provider instance.</p>
+     *
+     * @return Converter provider object (not-null)
+     */
     public ConverterProvider build() {
       return new ConverterProvider() {
         @SuppressWarnings("unchecked")
@@ -148,14 +188,28 @@ public class ConverterProviders {
             }
 
             @Override
-            public Result<T> convert(String value, Proper.Info<T> info) {
+            public Result<T> convert(String key, String value, Proper.Info<T> info) {
               for (Converter<T> converter : converterChain) {
-                Result<?> result = converter.convert(value, info);
+                Result<?> result = converter.convert(key, value, info);
                 if (!result.isSkip()) {
                   return (Result<T>) result;
                 }
               }
               return Result.skip();
+            }
+
+            @Override
+            public String toString() {
+              StringBuilder sb = new StringBuilder();
+              sb.append("ChainedConverter(chain=[");
+              Iterator<Converter<T>> it = converterChain.iterator();
+              while (it.hasNext()) {
+                sb.append(it.next().toString());
+                if (it.hasNext()) {
+                  sb.append(", ");
+                }
+              }
+              return sb.toString();
             }
           };
         }

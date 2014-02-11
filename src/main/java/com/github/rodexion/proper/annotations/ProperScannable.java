@@ -26,7 +26,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * ProperScannable
+ * <p>Classes containing static system property declarations
+ * need to be annotated with {@link ProperScannable} to make sure
+ * property scanner (validation scanner) can detect it.</p>
  *
  * @author rodion
  * @version X.0

@@ -21,9 +21,16 @@
 package com.github.rodexion.proper.scanner;
 
 /**
+ * <p>A tool for scanning property declarations in source code.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 public interface ProperScanner {
+  /**
+   * <p>Perform the scan</p>
+   *
+   * @return Scan result (not-null)
+   */
   ScanResult scan();
 }

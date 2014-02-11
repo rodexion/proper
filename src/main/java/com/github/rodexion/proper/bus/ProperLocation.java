@@ -24,13 +24,25 @@ import com.github.rodexion.proper.Proper;
 import lombok.Data;
 
 /**
+ * <p>Represents location in the source code where the system
+ * property was declared.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 @Data
 public class ProperLocation {
+  /**
+   * <p>Used when property location could not be determined, or is unapplicable.</p>
+   */
   public static final ProperLocation UNKNOWN = new ProperLocation("UNKNOWN", -1);
+  /**
+   * <p>Source file where property is declared.</p>
+   */
   private final String fileName;
+  /**
+   * <p>Line number in the source file where property is declared.</p>
+   */
   private final int lineNumber;
 
   public static ProperLocation getCurrentDeclarationLocation() {

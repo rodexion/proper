@@ -23,6 +23,8 @@ package com.github.rodexion.proper.validator;
 import static com.github.rodexion.proper.Examples.MyProper;
 import static com.github.rodexion.proper.Examples.MyProper.Unit;
 
+import com.github.rodexion.proper.LazyValue;
+import com.github.rodexion.proper.Proper;
 import com.github.rodexion.proper.Validators;
 import com.github.rodexion.proper.annotations.ProperScannable;
 
@@ -35,9 +37,27 @@ public class MyValidatedConstants {
   public static final int validInt = MyProper.ty("test.valid.int", 888, "A valid int", Unit.Int)
           .build().getValue();
 
-  public static final int invalidIntLineNumber = 40;
+  public static final int invalidIntLineNumber = 42;
   public static final String invalidIntProp = "test.invalid.int";
   public static final int invalidInt = MyProper.ty(invalidIntProp, 333, "An invalid int", Unit.Int)
           .validator(Validators.<Integer>comparableValidatorBuilder().max(500).build())
           .build().getValue();
+
+  @ProperScannable
+  public static final String complexProp = "test.complex.{0}";
+  public static final LazyValue<String> complexString = MyProper.ty(complexProp,
+          "default",
+          "Complex string prop",
+          Unit.Float,
+          "test1", "test2")
+          .validator(new Validators.BaseValidator<String>(String.class) {
+            @Override
+            public Result beforeConversion(String key, String value, Proper.Info<String> info) {
+              if (null == value) {
+                return Result.fail("sorry no prop found: " + key);
+              }
+              return ok();
+            }
+          })
+          .build();
 }

@@ -20,6 +20,7 @@
 
 package com.github.rodexion.proper.validator;
 
+import static com.github.rodexion.proper.Proper.DYNAMIC_KEY_SUBSTITUTIONS_DELIMITER;
 import static com.github.rodexion.proper.util.Preconditions.checkNotNull;
 
 import com.github.rodexion.proper.Proper;
@@ -28,6 +29,7 @@ import com.github.rodexion.proper.annotations.ProperScannable;
 import com.github.rodexion.proper.scanner.ProperDecl;
 import com.github.rodexion.proper.scanner.ProperScanner;
 import com.github.rodexion.proper.scanner.ProperScanners;
+import com.github.rodexion.proper.scanner.ScanResult;
 import com.github.rodexion.proper.util.Opt;
 import lombok.AllArgsConstructor;
 
@@ -59,17 +61,43 @@ public class ProperValidators {
     @Override
     public ValidationResult validate() {
       List<ValidationResult.Error> errors = new ArrayList<>();
-      for (ProperDecl properDecl : scanner.scan().getDeclarations()) {
-        ValidationErrorCapture errorCapture = new ValidationErrorCapture();
-        properDecl.getProperty().getValue(errorCapture);
-        if (errorCapture.hasError) {
-          errors.add(new ValidationResult.Error(
-                  properDecl.getProperty(),
-                  properDecl.getLocation(),
-                  errorCapture.validationError.get()));
+
+      ScanResult scanResult = scanner.scan();
+
+      for (ProperDecl properDecl : scanResult.getDeclarations()) {
+        Set<String[]> complexSubstitutions = new HashSet<>();
+
+        Object complexSubs = properDecl.getProperty().getInfo().getAttributes().get(Proper.ATTRIBUTE_DYNAMIC_KEY_SUBSTITUTIONS);
+        if (complexSubs == null) {
+          complexSubstitutions.add(new String[0]);//test without arguments (default)
+        } else if (complexSubs instanceof String[]) {
+          for (Object sub : (String[]) complexSubs) {
+            addAllDelimitedSubs(complexSubstitutions, sub);
+          }
+        } else if (complexSubs instanceof Iterable) {
+          for (Object sub : (Iterable<?>) complexSubs) {
+            addAllDelimitedSubs(complexSubstitutions, sub);
+          }
+        } else {
+          addAllDelimitedSubs(complexSubstitutions, complexSubs);
+        }
+        for (String[] sub : complexSubstitutions) {
+          ValidationErrorCapture errorCapture = new ValidationErrorCapture();
+          properDecl.getProperty().getValue(errorCapture, (Object[]) sub);
+
+          if (errorCapture.hasError) {
+            errors.add(new ValidationResult.Error(
+                    properDecl.getProperty(),
+                    properDecl.getLocation(),
+                    errorCapture.validationError.get()));
+          }
         }
       }
       return new ValidationResult(errors);
+    }
+
+    private void addAllDelimitedSubs(Set<String[]> complexSubstitutions, Object sub) {
+      complexSubstitutions.add(String.valueOf(sub).split(DYNAMIC_KEY_SUBSTITUTIONS_DELIMITER));
     }
 
     private static final class ValidationErrorCapture extends PropertyListeners.BasePropertyListener {
@@ -78,17 +106,17 @@ public class ProperValidators {
       boolean hasError = false;
 
       @Override
-      public void validationBeforeConversionFailed(String value, String validationError, Proper.Info<?> info) {
+      public void validationBeforeConversionFailed(String key, String value, String validationError, Proper.Info<?> info) {
         validationError(value, validationError);
       }
 
       @Override
-      public void conversionFailed(String value, String conversionError, Proper.Info<?> info) {
+      public void conversionFailed(String key, String value, String conversionError, Proper.Info<?> info) {
         validationError(value, conversionError);
       }
 
       @Override
-      public void validationAfterConversionFailed(Object value, String validationError, Proper.Info<?> info) {
+      public void validationAfterConversionFailed(String key, Object value, String validationError, Proper.Info<?> info) {
         validationError(value, validationError);
       }
 

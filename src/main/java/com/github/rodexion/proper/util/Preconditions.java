@@ -21,10 +21,22 @@
 package com.github.rodexion.proper.util;
 
 /**
+ * <p>Null-checking utilities.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 public class Preconditions {
+  /**
+   * <p>Throw {@link NullPointerException} if the given value
+   * is <code>null</code>.</p>
+   *
+   * @param name  Name to include in the error message (not-null)
+   * @param value Value to check for <code>null</code> (maybe-null)
+   * @param <T>   Value type
+   * @return The value given (not-null)
+   * @throws NullPointerException If the given value is null
+   */
   public static final <T> T checkNotNull(String name, T value) {
     if (null == value) {
       throw new NullPointerException(name + " is null");

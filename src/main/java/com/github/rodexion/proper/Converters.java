@@ -35,6 +35,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ * <p>A collection of default converter implementations</p>
+ *
  * @author rodexion
  * @since 0.1
  */
@@ -46,25 +48,46 @@ public class Converters {
     }
 
     @Override
-    public Result<Object> convert(String value, Proper.Info<Object> info) {
+    public Result<Object> convert(String key, String value, Proper.Info<Object> info) {
       return Result.skip();
+    }
+
+    @Override
+    public String toString() {
+      return "VoidConverter";
     }
   };
 
+  /**
+   * <p>Converter that always rejects requests for conversion.</p>
+   *
+   * @param <T> Conversion target type
+   * @return Converter object (not-null)
+   */
   @SuppressWarnings("unchecked")
   public static <T> Converter<T> voidConverter() {
     return (Converter<T>) voidConverter;
   }
 
+  /**
+   * <p>Converter that simply returns the original string.</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<String> stringConverter() {
     return new BaseConverter<String>(String.class) {
       @Override
-      public String doConvert(String value, Proper.Info<String> info) {
+      public String doConvert(String key, String value, Proper.Info<String> info) {
         return value;
       }
     };
   }
 
+  /**
+   * <p>Converter to {@link Byte}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<Byte> byteConverter() {
     return new NumberBaseConverter<Byte>(Byte.class) {
       @Override
@@ -74,6 +97,11 @@ public class Converters {
     };
   }
 
+  /**
+   * <p>Converter to {@link Short}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<Short> shortConverter() {
     return new NumberBaseConverter<Short>(Short.class) {
       @Override
@@ -83,6 +111,11 @@ public class Converters {
     };
   }
 
+  /**
+   * <p>Converter to {@link Integer}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<Integer> intConverter() {
     return new NumberBaseConverter<Integer>(Integer.class) {
       @Override
@@ -92,6 +125,11 @@ public class Converters {
     };
   }
 
+  /**
+   * <p>Converter to {@link Long}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<Long> longConverter() {
     return new NumberBaseConverter<Long>(Long.class) {
       @Override
@@ -101,6 +139,11 @@ public class Converters {
     };
   }
 
+  /**
+   * <p>Converter to {@link Float}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<Float> floatConverter() {
     return new NumberBaseConverter<Float>(Float.class) {
       @Override
@@ -110,6 +153,11 @@ public class Converters {
     };
   }
 
+  /**
+   * <p>Converter to {@link Double}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<Double> doubleConverter() {
     return new NumberBaseConverter<Double>(Double.class) {
       @Override
@@ -119,6 +167,11 @@ public class Converters {
     };
   }
 
+  /**
+   * <p>Converter to {@link BigDecimal}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<BigDecimal> bigDecimalConverter() {
     return new NumberBaseConverter<BigDecimal>(BigDecimal.class) {
       @Override
@@ -128,6 +181,11 @@ public class Converters {
     };
   }
 
+  /**
+   * <p>Converter to {@link BigInteger}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<BigInteger> bigIntegerConverter() {
     return new NumberBaseConverter<BigInteger>(BigInteger.class) {
       @Override
@@ -137,6 +195,11 @@ public class Converters {
     };
   }
 
+  /**
+   * <p>Converter to {@link Character}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<Character> characterConverter() {
     return new BaseConverter<Character>(Character.class) {
       @Override
@@ -145,7 +208,7 @@ public class Converters {
       }
 
       @Override
-      protected Character doConvert(String value, Proper.Info<Character> info) throws Exception {
+      protected Character doConvert(String key, String value, Proper.Info<Character> info) throws Exception {
         checkNotNull(value, info);
         if (value.equals(" ")) {
           return ' ';
@@ -160,26 +223,41 @@ public class Converters {
     };
   }
 
+  /**
+   * <p>Converter to {@link File}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<File> fileConverter() {
     return new BaseConverter<File>(File.class) {
       @Override
-      protected File doConvert(String value, Proper.Info<File> info) throws Exception {
+      protected File doConvert(String key, String value, Proper.Info<File> info) throws Exception {
         checkNotNull(value, info);
         return new File(value);
       }
     };
   }
 
+  /**
+   * <p>Converter to {@link Path}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static Converter<Path> pathConverter() {
     return new BaseConverter<Path>(Path.class) {
       @Override
-      protected Path doConvert(String value, Proper.Info<Path> info) throws Exception {
+      protected Path doConvert(String key, String value, Proper.Info<Path> info) throws Exception {
         checkNotNull(value, info);
         return Paths.get(value);
       }
     };
   }
 
+  /**
+   * <p>Converter to {@link Enum}</p>
+   *
+   * @return Converter object (not-null)
+   */
   public static <T extends Enum<T>> Converter<T> enumConverter() {
     return new BaseConverter<T>(null) {
       @Override
@@ -189,7 +267,7 @@ public class Converters {
 
       @SuppressWarnings("unchecked")
       @Override
-      protected T doConvert(String value, Proper.Info<T> info) throws Exception {
+      protected T doConvert(String key, String value, Proper.Info<T> info) throws Exception {
         checkNotNull(value, info);
         String v = value.trim().toLowerCase();
         for (T enumValue : info.getType().getEnumConstants()) {
@@ -198,6 +276,11 @@ public class Converters {
           }
         }
         throw new ConversionException(value, info);
+      }
+
+      @Override
+      public String toString() {
+        return "EnumConverter";
       }
     };
   }
@@ -224,7 +307,7 @@ public class Converters {
     }
 
     @Override
-    protected final T doConvert(String value, Proper.Info<T> info) throws Exception {
+    protected final T doConvert(String key, String value, Proper.Info<T> info) throws Exception {
       checkNotNull(value, info);
       String v = value.trim();
       try {
@@ -238,8 +321,22 @@ public class Converters {
     }
 
     abstract T parseNumber(String value);
+
+
+    @Override
+    public String toString() {
+      return "NumberConverter(" +
+              "type=" + getTypeClass() +
+              ", type2=" + typeClass2 +
+              ')';
+    }
   }
 
+  /**
+   * <p>Base class for creating custom converter objects.</p>
+   *
+   * @param <T>
+   */
   @Data
   public abstract static class BaseConverter<T> implements Converter<T> {
     private final Class<T> typeClass;
@@ -258,9 +355,9 @@ public class Converters {
     }
 
     @Override
-    public Result<T> convert(String value, Proper.Info<T> info) {
+    public Result<T> convert(String key, String value, Proper.Info<T> info) {
       try {
-        return ok(doConvert(value, info));
+        return ok(doConvert(key, value, info));
       } catch (Exception e) {
         if (e instanceof InterruptedException ||
                 e instanceof InterruptedIOException) {
@@ -270,7 +367,11 @@ public class Converters {
       }
     }
 
-    protected abstract T doConvert(String value, Proper.Info<T> info) throws Exception;
+    protected abstract T doConvert(String key, String value, Proper.Info<T> info) throws Exception;
+
+    public String toString() {
+      return "Converter(type=" + getTypeClass() + ')';
+    }
   }
 
   private Converters() {

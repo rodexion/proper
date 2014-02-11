@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * <p>Primitive type utilities.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
@@ -38,6 +40,14 @@ public class PrimitiveTypeUtil {
     put(Character.class, char.class);
   }};
 
+  /**
+   * <p>Return the primitive counterpart class for the given boxed type.</p>
+   *
+   * @param boxedClass Boxed type class (not-null)
+   * @param <T>        Type
+   * @return Primitive counterpart class, or <code>null</code>
+   *         if such class does not exist. (maybe-null)
+   */
   @SuppressWarnings("unchecked")
   public static <T> Class<T> getPrimitiveClass(Class<T> boxedClass) {
     return (Class<T>) primitiveCounterparts.get(boxedClass);

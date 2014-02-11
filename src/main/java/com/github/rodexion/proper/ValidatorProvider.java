@@ -21,9 +21,21 @@
 package com.github.rodexion.proper;
 
 /**
+ * <p>Provider of validators for a specified property conversion type.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 public interface ValidatorProvider {
+  /**
+   * <p>Retrieve validator for the given property conversion type, if any.</p>
+   * <p>In case an appropriate validator is not found,
+   * an instance of {@link com.github.rodexion.proper.Validators#voidValidator()} or
+   * equivalent should be returned, instead of <code>null</code>.</p>
+   *
+   * @param forType Type to which the target property is to be converted to
+   * @param <T>     Type to which the target property is to be converted to
+   * @return Validator object instance (not-null)
+   */
   <T> Validator<T> getValidator(Class<T> forType);
 }

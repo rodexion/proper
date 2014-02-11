@@ -39,11 +39,10 @@ import org.junit.runner.RunWith;
 @RunWith(SeparateClassLoaderTestRunner.class)
 public class NonAnnotatedFieldsScanTest {
   @Test
-  public void propertiesNotMarkedWithScannableCanBeDetectedWithFullValidaition() {
+  public void propertiesNotMarkedWithScannableCanBeDetectedWithFullValidation() {
     ValidationResult withErrors = ProperValidators.validateAll(TestConstants.PROPER_BASE_PACKAGE).validate();
     System.setProperty(MyValidatedConstants.invalidIntProp, "123");
     assertThat(withErrors.getValidationErrors())
-            .hasSize(1)
             .haveExactly(1, new Condition<ValidationResult.Error>() {
               @Override
               public boolean matches(ValidationResult.Error value) {

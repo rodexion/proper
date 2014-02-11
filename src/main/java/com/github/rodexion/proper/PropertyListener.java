@@ -21,19 +21,57 @@
 package com.github.rodexion.proper;
 
 /**
+ * <p>Listener of property declaration, conversion and validation events.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 public interface PropertyListener {
-  void defined(Proper.Info<?> info);
+  /**
+   * <p>Triggered when property is not found upon retrieval.</p>
+   *
+   * @param key  Property key (not-null)
+   * @param info Property meta data (not-null)
+   */
+  void notFound(String key, Proper.Info<?> info);
 
-  void notFound(Proper.Info<?> info);
+  /**
+   * <p>Triggered when property value has failed to be validated, before value conversion step.</p>
+   *
+   * @param key             Property key (not-null)
+   * @param value           Property value (maybe-null)
+   * @param validationError Validation error message (not-null)
+   * @param info            Property meta data (not-null)
+   */
+  void validationBeforeConversionFailed(String key, String value, String validationError, Proper.Info<?> info);
 
-  void validationBeforeConversionFailed(String value, String validationError, Proper.Info<?> info);
+  /**
+   * <p>Triggered when property value has failed to be converted.</p>
+   *
+   * @param key             Property key (not-null)
+   * @param value           Property value (maybe-null)
+   * @param conversionError Conversion error message (not-null)
+   * @param info            Property meta data (not-null)
+   */
+  void conversionFailed(String key, String value, String conversionError, Proper.Info<?> info);
 
-  void conversionFailed(String value, String conversionError, Proper.Info<?> info);
+  /**
+   * <p>Triggered when property value has failed to be validated, after value conversion step.</p>
+   *
+   * @param key             Property key (not-null)
+   * @param value           Converted property value (maybe-null)
+   * @param validationError Validation error message (not-null)
+   * @param info            Property meta data (not-null)
+   */
+  void validationAfterConversionFailed(String key, Object value, String validationError, Proper.Info<?> info);
 
-  void validationAfterConversionFailed(Object value, String validationError, Proper.Info<?> info);
-
-  void success(String stringValue, Object convertedValue, Proper.Info<?> info);
+  /**
+   * <p>Triggered when property value has failed to be validated, before value conversion step.</p>
+   *
+   * @param key            Property key (not-null)
+   * @param stringValue    Property value before conversion (maybe-null)
+   * @param convertedValue Converted property value (not-null)
+   * @param info           Property meta data (not-null)
+   */
+  void success(String key, String stringValue, Object convertedValue, Proper.Info<?> info);
 }

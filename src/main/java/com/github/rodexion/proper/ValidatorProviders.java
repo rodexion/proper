@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>A collection of default property validator providers.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
@@ -37,14 +39,36 @@ public class ValidatorProviders {
     }
   };
 
+  /**
+   * <p>Provider that always returns an instance of
+   * {@link com.github.rodexion.proper.Validators#voidValidator()}.</p>
+   *
+   * @return Validator provider object (not-null)
+   */
   public static ValidatorProvider voidValidatorProvider() {
     return voidValidatorProvider;
   }
 
+  /**
+   * <p>Creates a validator provider builder.</p>
+   *
+   * @return Validator provider builder object (not-null)
+   */
   public static Builder builder() {
     return new Builder();
   }
 
+  /**
+   * <p>A tool for creating a complex validator provider, delegating
+   * to several validators and/or validator providers.</p>
+   * <p/>
+   * <p>For each validation request, validators in the validator chain,
+   * will be checked in order they are registered, using {@link Validator#canValidate(Class)} method.
+   * Then each validator that claims to validate the given property, will be
+   * consulted to check if the property is valid. All validators have to succeed
+   * in order for the property to be considered valid, otherwise validation error is
+   * thrown and the default value is used.</p>
+   */
   public static class Builder {
     private final List<ValidatorProvider> validatorProviders = new ArrayList<>();
     private final List<Validator<?>> validators = new ArrayList<>();
@@ -52,16 +76,34 @@ public class ValidatorProviders {
     Builder() {
     }
 
+    /**
+     * <p>Add a validator to validator lookup chain.</p>
+     *
+     * @param validator Validator object (not-null)
+     * @return this builder object (not-null)
+     */
     public Builder add(Validator<?> validator) {
       validators.add(checkNotNull("validator", validator));
       return this;
     }
 
+    /**
+     * <p>Add all validators from the given validator provider.</p>
+     *
+     * @param validatorProvider Validator provider object (not-null)
+     * @return this builder object (not-null)
+     */
     public Builder allFrom(ValidatorProvider validatorProvider) {
       validatorProviders.add(checkNotNull("validatorProvider", validatorProvider));
       return this;
     }
 
+    /**
+     * <p>Create an instance of validator provider containing all
+     * validators registered using addition methods.</p>
+     *
+     * @return this builder object (not-null)
+     */
     public ValidatorProvider build() {
       return new ValidatorProvider() {
         @SuppressWarnings("unchecked")
@@ -86,9 +128,9 @@ public class ValidatorProviders {
             }
 
             @Override
-            public Result beforeConversion(String value, Proper.Info<T> info) {
+            public Result beforeConversion(String key, String value, Proper.Info<T> info) {
               for (Validator<T> validator : validatorChain) {
-                Result result = validator.beforeConversion(value, info);
+                Result result = validator.beforeConversion(key, value, info);
                 if (!result.isOk()) {
                   return result;
                 }
@@ -97,9 +139,9 @@ public class ValidatorProviders {
             }
 
             @Override
-            public Result afterConversion(T value, Proper.Info<T> info) {
+            public Result afterConversion(String key, T value, Proper.Info<T> info) {
               for (Validator<T> validator : validatorChain) {
-                Result result = validator.afterConversion(value, info);
+                Result result = validator.afterConversion(key, value, info);
                 if (!result.isOk()) {
                   return result;
                 }

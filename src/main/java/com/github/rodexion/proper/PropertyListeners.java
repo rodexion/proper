@@ -21,40 +21,46 @@
 package com.github.rodexion.proper;
 
 /**
+ * <p>Collection of default property listener implementations.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 public class PropertyListeners {
   private static final PropertyListener voidListener = new BasePropertyListener();
 
+  /**
+   * <p>Creates a property listener that does nothing.</p>
+   *
+   * @return Property listener object (not-null)
+   */
   public static PropertyListener voidListener() {
     return voidListener;
   }
 
+  /**
+   * <p>Base class for creating custom property listeners.</p>
+   */
   public static class BasePropertyListener implements PropertyListener {
 
     @Override
-    public void defined(Proper.Info<?> info) {
+    public void notFound(String key, Proper.Info<?> info) {
     }
 
     @Override
-    public void notFound(Proper.Info<?> info) {
+    public void validationBeforeConversionFailed(String key, String value, String validationError, Proper.Info<?> info) {
     }
 
     @Override
-    public void validationBeforeConversionFailed(String value, String validationError, Proper.Info<?> info) {
+    public void conversionFailed(String key, String value, String conversionError, Proper.Info<?> info) {
     }
 
     @Override
-    public void conversionFailed(String value, String conversionError, Proper.Info<?> info) {
+    public void validationAfterConversionFailed(String key, Object value, String validationError, Proper.Info<?> info) {
     }
 
     @Override
-    public void validationAfterConversionFailed(Object value, String validationError, Proper.Info<?> info) {
-    }
-
-    @Override
-    public void success(String stringValue, Object convertedValue, Proper.Info<?> info) {
+    public void success(String key, String stringValue, Object convertedValue, Proper.Info<?> info) {
     }
   }
 

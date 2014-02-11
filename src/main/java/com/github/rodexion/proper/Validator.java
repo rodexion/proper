@@ -27,23 +27,62 @@ import lombok.Data;
  * @since 0.1
  */
 public interface Validator<T> {
+
+  /**
+   * <p>Representation of validation outcome.</p>
+   */
   @Data
   public static class Result {
     private final boolean ok;
     private final String errorMessage;
 
+    /**
+     * <p>Creates a validation success result object.</p>
+     *
+     * @return Validation result object (not-null)
+     */
     public static final Result ok() {
       return new Result(true, null);
     }
 
+    /**
+     * <p>Creates a validation failure result object.</p>
+     *
+     * @param errorMessage Validation error message (not-null)
+     * @return Validation result object (not-null)
+     */
     public static final Result fail(String errorMessage) {
       return new Result(false, errorMessage);
     }
   }
 
+  /**
+   * <p>Return <code>true</code> if this validator is to be applied
+   * against properties of type specified by the method argument.</p>
+   *
+   * @param type Property type
+   * @return <code>true</code> if this validator will be applied,
+   *         <code>false</code> otherwise.
+   */
   boolean canValidate(Class<?> type);
 
-  Result beforeConversion(String value, Proper.Info<T> info);
+  /**
+   * <p>Invoked before any of the converters are applied</p>
+   *
+   * @param key   Key being validated (not-null)
+   * @param value System property value retrieved (maybe-null)
+   * @param info  Associated property info object (not-null)
+   * @return Validation result
+   */
+  Result beforeConversion(String key, String value, Proper.Info<T> info);
 
-  Result afterConversion(T value, Proper.Info<T> info);
+  /**
+   * <p>Invoked after all of the converters are applied</p>
+   *
+   * @param key   Key being validated (not-null)
+   * @param value System property value retrieved (maybe-null)
+   * @param info  Associated property info object (not-null)
+   * @return Validation result
+   */
+  Result afterConversion(String key, T value, Proper.Info<T> info);
 }

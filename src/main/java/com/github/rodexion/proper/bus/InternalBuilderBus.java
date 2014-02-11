@@ -27,16 +27,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>Internal class used for accumulating detected
+ * system property declarations.</p>
+ *
  * @author rodexion
  * @since 0.1
  */
 public class InternalBuilderBus {
   private static final List<ProperDecl> properties = new ArrayList<>();
 
+  /**
+   * <p>Register the given property as detected.</p>
+   *
+   * @param info     Property meta data (not-null)
+   * @param location Property location data (not-null)
+   */
   public static void firePropertyBuilt(Proper.Ty<?> info, ProperLocation location) {
     properties.add(new ProperDecl(info, location));
   }
 
+  /**
+   * <p>Retrieve all accumulated properties</p>
+   *
+   * @return All accumulated properties (not-null)
+   */
   public static List<ProperDecl> getFoundProperties() {
     return new ArrayList<>(properties);
   }

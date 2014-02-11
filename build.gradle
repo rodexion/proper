@@ -63,6 +63,10 @@ sourceSets {
   }
 }
 
+test {
+  include 'com/github/rodexion/proper/AllTests.class'
+}
+
 def srcDelomboked = 'build/src-delomboked'
 
 task delombok {

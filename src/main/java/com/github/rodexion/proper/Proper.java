@@ -24,6 +24,7 @@ import static com.github.rodexion.proper.util.Preconditions.checkNotNull;
 
 import lombok.*;
 
+import java.text.MessageFormat;
 import java.util.Map;
 
 /**
@@ -35,11 +36,39 @@ import java.util.Map;
  */
 public class Proper {
   /**
+   * <p>Special property attribute for specifying a list of possible
+   * dynamic key name substitutions, to be used for validation purposes.</p>
+   * <p>Keys my be declared as dynamic-keys using {@link java.text.MessageFormat}.
+   * For example the key may be declared as <code>"my.setting.for.{0}.{1}"</code>,
+   * and therefore possible key values are not entirely known, however developer might wish to
+   * validate a default set of possible keys.</p>
+   * <p>Consider default keys to be validated are:
+   * <ul>
+   * <li><code>"my.setting.for.a.a"</code></li>
+   * <li><code>"my.setting.for.a.b"</code></li>
+   * <li><code>"my.setting.for.x.y"</code></li>
+   * </ul>
+   * <p/>
+   * In order to validate the above, set {@linkplain #ATTRIBUTE_DYNAMIC_KEY_SUBSTITUTIONS}
+   * property attribute with a list of comma-separated tuples, as below:
+   * <pre><code>
+   *   {"a,a", "a,b", "x,y"}
+   * </code></pre>
+   * </p>
+   */
+  public static String ATTRIBUTE_DYNAMIC_KEY_SUBSTITUTIONS = "_dynamic_key_substitutions";
+
+  /**
+   * <p>Delimiter for dynamic key substitution tuples</p>
+   *
+   * @see #ATTRIBUTE_DYNAMIC_KEY_SUBSTITUTIONS Dynamic key substitutions
+   */
+  public static String DYNAMIC_KEY_SUBSTITUTIONS_DELIMITER = ",";
+
+  /**
    * <p>Basic property information holder</p>
    * <p>Note: Hash code and equals implementations are only based on the
    * {@link #key} value.</p>
-   *
-   * @param <T>
    */
   @Data
   @EqualsAndHashCode(of = {"key"})
@@ -65,8 +94,6 @@ public class Proper {
   /**
    * <p>Note: Hash code and equals implementations are only based on the {@link #info},
    * which in turn is only based on its {@link Info#key} field.</p>
-   *
-   * @param <T>
    */
   @AllArgsConstructor
   @ToString
@@ -90,8 +117,8 @@ public class Proper {
      *
      * @return Current value for this system property, or the default value
      */
-    public T getValue() {
-      return getValue(propertyListener);
+    public T getValue(Object... args) {
+      return getValue(propertyListener, args);
     }
 
     /**
@@ -104,36 +131,44 @@ public class Proper {
      * @param propertyListener property listener to use
      * @return Current value for this system property, or the default value
      */
-    public T getValue(PropertyListener propertyListener) {
-      String value = System.getProperty(info.getKey());
+    public T getValue(PropertyListener propertyListener, Object... args) {
+      String key = MessageFormat.format(info.getKey(), args);
+      String value = System.getProperty(key);
       if (null == value) {
-        propertyListener.notFound(info);
-        return info.getDefaultValue();
+        propertyListener.notFound(key, info);
       }
-      Validator.Result validationBefore = validator.beforeConversion(value, info);
+      Validator.Result validationBefore = validator.beforeConversion(key, value, info);
       if (!validationBefore.isOk()) {
-        propertyListener.validationBeforeConversionFailed(value, validationBefore.getErrorMessage(), info);
+        propertyListener.validationBeforeConversionFailed(key, value, validationBefore.getErrorMessage(), info);
         return info.getDefaultValue();
       }
-      Converter.Result<T> result = converter.convert(value, info);
+      if (null == value) {
+        return info.getDefaultValue();
+      }
+      Converter.Result<T> result = converter.convert(key, value, info);
       if (result.isFailure()) {
-        propertyListener.conversionFailed(value, result.getErrorMessage(), info);
+        propertyListener.conversionFailed(key, value, result.getErrorMessage(), info);
         return info.getDefaultValue();
       } else if (result.isSkip()) {
         //Maybe value does not need conversion
         if (info.getType().isAssignableFrom(String.class)) {
-          return (T) value;
+          return safeStringCast(value);
         } else {
-          propertyListener.conversionFailed(value, "No suitable converter found", info);
+          propertyListener.conversionFailed(key, value, "No suitable converter found", info);
         }
       }
-      Validator.Result validationAfter = validator.afterConversion(result.getValue(), info);
+      Validator.Result validationAfter = validator.afterConversion(key, result.getValue(), info);
       if (!validationAfter.isOk()) {
-        propertyListener.validationAfterConversionFailed(result.getValue(), validationAfter.getErrorMessage(), info);
+        propertyListener.validationAfterConversionFailed(key, result.getValue(), validationAfter.getErrorMessage(), info);
         return info.getDefaultValue();
       }
-      propertyListener.success(value, result.getValue(), info);
+      propertyListener.success(key, value, result.getValue(), info);
       return result.getValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    private T safeStringCast(String value) {
+      return (T) value;
     }
   }
 
